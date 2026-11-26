@@ -122,6 +122,14 @@ footer p{margin:0}
         <label class="check"><input type="checkbox" id="corr"> Wearing glasses or contacts (corrected)</label>
       </fieldset>
       <fieldset>
+        <legend>Slipping focus</legend>
+        <button type="button" id="slipBtn" class="chip" aria-pressed="false">Play slipping focus</button>
+        <div class="row"><label for="slipMode">Drifts to</label>
+          <select id="slipMode"><option value="eyes">Other eye's focus</option><option value="relax">Relaxed (fatigue)</option></select><span></span></div>
+        <div class="row"><label for="slipHold">Holds for</label><input id="slipHold" type="range" min="0.4" max="3" step="0.1" value="1"><output id="slipHoldOut">1.0 s</output></div>
+        <p class="note">A hypothesis: with one eye minus and one plus, the eyes ask for different focus, and the shared focus hunts between them.</p>
+      </fieldset>
+      <fieldset>
         <legend>Prescription</legend>
         <div class="rx" id="rx-R"></div>
         <div class="rx" id="rx-L"></div>
@@ -142,6 +150,8 @@ footer p{margin:0}
       <p>The eyes need different corrections but always focus by the same amount. When the dominant eye has a sharp front sight, the other eye sees something else entirely. With both eyes open the brain usually picks the dominant eye's image.</p></article>
     <article class="card"><h3>Red dot</h3><span class="rxs">dot ≈ infinity</span>
       <p>The dot sits optically far away, in the same focus as the target. One distance, no fight between front sight and target. That's why a dot helps many people with little focus range. Astigmatism still makes the dot star-shaped.</p></article>
+    <article class="card"><h3>Slipping focus (hypothesis)</h3><span class="rxs">one eye −, one eye +</span>
+      <p>Both eyes share one focus. When one eye is nearsighted and the other farsighted, the front sight needs almost no focus for one eye and a lot for the other. Blur in either eye can pull the focus, so it may hunt: sharp for a moment, then drifting. Ask an optician or orthoptist; this page only illustrates the idea.</p></article>
     <article class="card"><h3>A small pupil helps</h3><span class="rxs">pupil 2–7 mm</span>
       <p>Blur grows with the pupil. In bright light the pupil shrinks and more distances look sharp at once. That's why precision shooters may use an iris aperture in front of the eye.</p></article>
   </section>
@@ -208,6 +218,8 @@ footer p{margin:0}
 
   const bindRange = (id, key) => $("#"+id).addEventListener("input", e => { st[key] = parseFloat(e.target.value); if(key==="amp") st.preset=null; render(); });
   bindRange("amp","amp"); bindRange("pupil","pupil"); bindRange("dist","dist");
+  $("#slipBtn").addEventListener("click", () => setAnim(!anim.on));
+  $("#slipHold").addEventListener("input", e => { $("#slipHoldOut").textContent = parseFloat(e.target.value).toFixed(1) + " s"; });
   $("#dom").addEventListener("change", e => { st.dom = e.target.value; render(); });
   $("#corr").addEventListener("change", e => { st.corrected = e.target.checked; render(); });
   for (const [seg, key] of [["#segSight","sight"],["#segFocus","focus"]]) {
@@ -236,12 +248,53 @@ footer p{margin:0}
       ? [ {id:"target", name:"Target", V:far}, {id:"front", name:"Front sight", V:-1/D_FRONT}, {id:"rear", name:"Rear sight", V:-1/D_REAR} ]
       : [ {id:"target", name:"Target", V:far}, {id:"dot", name:"Dot", V:0}, {id:"frame", name:"Optic window", V:-1/D_FRAME} ];
   }
-  function accommodation(){
-    const [m1, m2] = meridians(st.dom);
+  function focusDemand(k){
+    const [m1, m2] = meridians(k);
     const se = (m1 + m2) / 2;
     const Vf = st.focus === "near" ? (st.sight==="irons" ? -1/D_FRONT : -1/D_FRAME) : -1/st.dist;
     const need = se - Vf;
     return { A: Math.min(Math.max(need, 0), st.amp), need };
+  }
+  function accommodation(){
+    const base = focusDemand(st.dom);
+    return anim.A === null ? base : { A: anim.A, need: base.need, animating: true };
+  }
+
+  // Slipping focus: hold on the dominant eye's focus, drift toward the other eye's demand
+  // (or toward relaxed), then pull back. Hypothesis, not measured.
+  const anim = { on:false, A:null, t0:0, last:0, raf:0 };
+  const ease = x => x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x);
+  function slipTarget(){
+    const mode = $("#slipMode").value;
+    if (mode === "relax") return 0;
+    return focusDemand(st.dom === "R" ? "L" : "R").A;
+  }
+  function animFrame(ts){
+    if (!anim.on) return;
+    if (!anim.t0) anim.t0 = ts;
+    if (ts - anim.last >= 50) {
+      anim.last = ts;
+      const hold = parseFloat($("#slipHold").value);
+      const cyc = [hold, 0.5, 0.4, 0.7];            // hold, drift out, stay off, pull back (s)
+      const T = cyc.reduce((a,b)=>a+b, 0);
+      const t = ((ts - anim.t0) / 1000) % T;
+      const a0 = focusDemand(st.dom).A, a1 = slipTarget();
+      let f;
+      if (t < cyc[0]) f = 0;
+      else if (t < cyc[0]+cyc[1]) f = ease((t - cyc[0]) / cyc[1]);
+      else if (t < cyc[0]+cyc[1]+cyc[2]) f = 1;
+      else f = 1 - ease((t - cyc[0]-cyc[1]-cyc[2]) / cyc[3]);
+      anim.A = a0 + (a1 - a0) * f;
+      render();
+    }
+    anim.raf = requestAnimationFrame(animFrame);
+  }
+  function setAnim(on){
+    anim.on = on; anim.t0 = 0; anim.last = 0;
+    cancelAnimationFrame(anim.raf);
+    if (on) anim.raf = requestAnimationFrame(animFrame); else { anim.A = null; render(); }
+    $("#slipBtn").textContent = on ? "Stop" : "Play slipping focus";
+    $("#slipBtn").setAttribute("aria-pressed", String(on));
   }
   const sdFor = d => st.pupil * d * 1.02;  // px std-dev for defocus d (dioptres)
   function quality(d){
@@ -372,6 +425,7 @@ footer p{margin:0}
     }
     else if (acc.need < -0.01) msg += ` The eye is nearsighted enough to see ${target} with a fully relaxed eye.`;
     else if (acc.need > 0.75 * st.amp && acc.need > 0.5) msg += ` That is near the limit, so it gets tiring over time.`;
+    if (acc.animating) msg = `<b>Slipping focus:</b> ` + msg;
     $("#accNote").innerHTML = msg;
   }
 
