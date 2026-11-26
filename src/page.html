@@ -169,7 +169,7 @@ footer p{margin:0}
   const CX = 320, AIM_Y = 228;
 
   const PRESETS = [
-    { id:"mine",    name:"Mine (aniso + astig)", amp:4, dominance:95,   R:[-0.75,-1.25,175], L:[1.75,-0.75,165] },
+    { id:"mine",    name:"Mine (aniso + astig)", amp:4, dominance:90, corrected:true, accuracy:85, wobble:0.75,   R:[-0.75,-1.25,175], L:[1.75,-0.75,165] },
     { id:"normal",  name:"Normal, age 25", amp:9,   R:[0,0,0],       L:[0,0,0] },
     { id:"presby",  name:"Presbyopia, age 55",    amp:1,   R:[0,0,0],       L:[0,0,0] },
     { id:"myo15",   name:"Nearsighted −1.5",       amp:7,   R:[-1.5,0,0],    L:[-1.5,0,0] },
@@ -179,7 +179,7 @@ footer p{margin:0}
     { id:"aniso",   name:"Anisometropia only",       amp:6,   R:[-1.25,0,0],   L:[1.5,0,0] },
   ];
 
-  const st = { preset:null, amp:9, pupil:4, dist:10, sight:"irons", focus:"near", dom:"R", corrected:false, accuracy:85, wobble:1.2, view:"both", dominance:80,
+  const st = { preset:null, amp:9, pupil:4, dist:10, sight:"irons", focus:"near", dom:"R", corrected:false, accuracy:85, wobble:0.75, view:"both", dominance:80,
                eye:{ R:{sph:0,cyl:0,axis:0}, L:{sph:0,cyl:0,axis:0} } };
 
   const $ = (s, r=document) => r.querySelector(s);
@@ -187,7 +187,8 @@ footer p{margin:0}
   const deg = (m, d) => Math.atan(m / d) * 180 / Math.PI * PPD; // metres at distance -> px
 
   function applyPreset(p){
-    st.preset = p.id; st.amp = p.amp; st.corrected = false; st.dominance = p.dominance ?? 80;
+    st.preset = p.id; st.amp = p.amp; st.corrected = p.corrected ?? false; st.dominance = p.dominance ?? 80;
+    if (p.accuracy != null) st.accuracy = p.accuracy; if (p.wobble != null) st.wobble = p.wobble;
     for (const k of ["R","L"]) { const [s,c,a] = p[k]; st.eye[k] = {sph:s, cyl:c, axis:a}; }
     syncControls(); render();
   }
