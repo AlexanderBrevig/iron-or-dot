@@ -1,6 +1,6 @@
 # iron-or-dot
 
-**Korn, hakk og dioptrier:** an interactive model of the pistol sight picture (iron sights vs. red dot) for different prescriptions: myopia, hyperopia, presbyopia, astigmatism and anisometropia. Norwegian UI.
+**Iron or Dot:** an interactive model of the pistol sight picture (iron sights vs. red dot) for different prescriptions: myopia, hyperopia, presbyopia, astigmatism and anisometropia. Defaults to the author's own eyes (anisometropia + astigmatism) as an extreme example; isolated astigmatism-only and anisometropia-only presets are included.
 
 - `src/page.html`: the page as a fragment (no doctype/head); also published as a claude.ai Artifact.
 - `build.sh`: wraps the fragment into `index.html` for GitHub Pages.

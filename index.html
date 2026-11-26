@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="nb">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Korn, hakk og dioptrier</title>
-<meta name="description" content="Interaktiv modell av siktebildet med åpne sikter og rødpunkt: nærsynt, langsynt, aldersyn, astigmatisme og anisometropi.">
-<meta property="og:title" content="Korn, hakk og dioptrier">
-<meta property="og:description" content="Slik kan siktebildet se ut med ulike brillestyrker, med åpne sikter og rødpunkt.">
+<title>Iron or Dot</title>
+<meta name="description" content="Interactive model of the pistol sight picture, iron sights vs red dot, for nearsighted, farsighted, presbyopic, astigmatic and anisometropic eyes.">
+<meta property="og:title" content="Iron or Dot">
+<meta property="og:description" content="What iron sights and a red dot look like through different prescriptions.">
 </head>
 <body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -83,72 +83,72 @@ footer p{margin:0}
 
 <div class="wrap">
   <header>
-    <h1>Korn, hakk og <span>dioptrier</span></h1>
-    <p class="lede">Slik kan siktebildet se ut med ulike brillestyrker. Øyet har skarpt fokus på én avstand om gangen: bakre sikte ligger ca. 55 cm unna, kornet ca. 70 cm og blinken 5–25 m. Velg et eksempel eller skru på styrken selv.</p>
+    <h1>Iron <span>or</span> dot</h1>
+    <p class="lede">What the sight picture can look like with different prescriptions. The eye focuses sharply at one distance at a time: the rear sight is about 55 cm away, the front sight about 70 cm and the target 5–25 m. Pick an example or dial in a prescription yourself.</p>
   </header>
 
-  <div class="presets" id="presets" role="group" aria-label="Eksempler"></div>
+  <div class="presets" id="presets" role="group" aria-label="Examples"></div>
 
   <div class="main">
-    <section class="eyes" aria-label="Siktebilde per øye">
+    <section class="eyes" aria-label="Sight picture per eye">
       <div class="eye" id="eye-R"></div>
       <div class="eye" id="eye-L"></div>
       <p class="note" id="accNote" style="grid-column:1/-1"></p>
     </section>
 
-    <aside aria-label="Innstillinger">
+    <aside aria-label="Settings">
       <fieldset>
-        <legend>Sikte</legend>
+        <legend>Sights</legend>
         <div class="seg" id="segSight">
-          <button type="button" data-v="irons" aria-pressed="true">Åpne sikter</button>
-          <button type="button" data-v="dot" aria-pressed="false">Rødpunkt</button>
+          <button type="button" data-v="irons" aria-pressed="true">Iron sights</button>
+          <button type="button" data-v="dot" aria-pressed="false">Red dot</button>
         </div>
       </fieldset>
       <fieldset>
-        <legend>Fokuser på</legend>
+        <legend>Focus on</legend>
         <div class="seg" id="segFocus">
-          <button type="button" data-v="near" aria-pressed="true" id="focusNear">Kornet</button>
-          <button type="button" data-v="far" aria-pressed="false">Blinken</button>
+          <button type="button" data-v="near" aria-pressed="true" id="focusNear">Front sight</button>
+          <button type="button" data-v="far" aria-pressed="false">Target</button>
         </div>
       </fieldset>
       <fieldset>
-        <legend>Øyne og alder</legend>
-        <div class="row"><label for="amp">Fokusevne</label><input id="amp" type="range" min="0" max="10" step="0.25"><output id="ampOut"></output></div>
+        <legend>Eyes and age</legend>
+        <div class="row"><label for="amp">Focus range</label><input id="amp" type="range" min="0" max="10" step="0.25"><output id="ampOut"></output></div>
         <p class="note" id="ageHint" style="margin-top:-4px"></p>
-        <div class="row"><label for="pupil">Pupille</label><input id="pupil" type="range" min="2" max="7" step="0.5"><output id="pupilOut"></output></div>
-        <div class="row"><label for="dist">Blink</label><input id="dist" type="range" min="5" max="25" step="1"><output id="distOut"></output></div>
+        <div class="row"><label for="pupil">Pupil</label><input id="pupil" type="range" min="2" max="7" step="0.5"><output id="pupilOut"></output></div>
+        <div class="row"><label for="dist">Target</label><input id="dist" type="range" min="5" max="25" step="1"><output id="distOut"></output></div>
         <div class="row"><label for="dom">Dominant</label>
-          <select id="dom"><option value="R">Høyre øye</option><option value="L">Venstre øye</option></select><span></span></div>
-        <label class="check"><input type="checkbox" id="corr"> Med briller eller linser (korrigert)</label>
+          <select id="dom"><option value="R">Right eye</option><option value="L">Left eye</option></select><span></span></div>
+        <label class="check"><input type="checkbox" id="corr"> Wearing glasses or contacts (corrected)</label>
       </fieldset>
       <fieldset>
-        <legend>Styrke (brilleseddel)</legend>
+        <legend>Prescription</legend>
         <div class="rx" id="rx-R"></div>
         <div class="rx" id="rx-L"></div>
       </fieldset>
     </aside>
   </div>
 
-  <section class="cards" aria-label="Forklaring">
-    <article class="card"><h3>Nærsynt (minus)</h3><span class="rxs">sfære −</span>
-      <p>Uten briller ligger det skarpe punktet nært: ved −1,5 rundt 67 cm, altså omtrent ved kornet. Kornet blir skarpt nesten gratis, mens blinken blir uskarp. Ved −4 ligger det skarpe punktet på 25 cm, og da er alt i siktebildet uskarpt.</p></article>
-    <article class="card"><h3>Langsynt (pluss)</h3><span class="rxs">sfære +</span>
-      <p>Øyet må bruke fokusevne bare for å se langt. Unge øyne klarer det, men kornet krever enda mer. Med alderen tar fokusevnen slutt, og kornet blir uskarpt først.</p></article>
-    <article class="card"><h3>Aldersyn</h3><span class="rxs">fokusevne ↓</span>
-      <p>Fokusevnen synker gjennom hele livet. Kornet på 70 cm trenger 1,4 dioptrier. Rundt 50 år begynner det å gå tregt, og etter hvert blir kornet uskarpt mens blinken fortsatt er skarp.</p></article>
-    <article class="card"><h3>Astigmatisme (sylinder)</h3><span class="rxs">sylinder × akse</span>
-      <p>Øyet har ulik styrke i ulike retninger. Da blir kanter uskarpe i én retning: sidene på kornet kan være skarpe mens toppen flyter ut. Et rødpunkt blir til en strek eller en komet.</p></article>
-    <article class="card"><h3>Anisometropi</h3><span class="rxs">ulik styrke H / V</span>
-      <p>Øynene trenger ulik styrke, men fokuserer alltid like mye. Når det dominante øyet har skarpt korn, ser det andre øyet noe helt annet. Med begge øyne åpne velger hjernen som regel bildet fra det dominante øyet.</p></article>
-    <article class="card"><h3>Rødpunkt</h3><span class="rxs">punkt ≈ uendelig</span>
-      <p>Punktet ligger optisk langt unna, i samme fokus som blinken. Da trenger du bare én avstand, ingen kamp mellom korn og blink. Derfor hjelper rødpunkt mange med svak fokusevne. Astigmatisme gjør likevel punktet stjerneformet.</p></article>
-    <article class="card"><h3>Liten pupille hjelper</h3><span class="rxs">pupille 2–7 mm</span>
-      <p>Uskarphet vokser med pupillen. I sterkt lys blir pupillen liten og flere avstander ser skarpe ut samtidig. Det er derfor presisjonsskyttere kan bruke en blender (iris) foran øyet.</p></article>
+  <section class="cards" aria-label="Explanations">
+    <article class="card"><h3>Nearsighted (minus)</h3><span class="rxs">sphere −</span>
+      <p>Without glasses the sharp point sits close: at −1.5 around 67 cm, roughly at the front sight. The front sight is sharp almost for free, while the target blurs. At −4 the sharp point is at 25 cm, and everything in the sight picture is blurry.</p></article>
+    <article class="card"><h3>Farsighted (plus)</h3><span class="rxs">sphere +</span>
+      <p>The eye has to spend focus just to see far. Young eyes manage, but the front sight asks for even more. With age the focus runs out, and the front sight goes first.</p></article>
+    <article class="card"><h3>Presbyopia</h3><span class="rxs">focus range ↓</span>
+      <p>Focus range shrinks through life. A front sight at 70 cm needs 1.4 dioptres. Around 50 it gets slow, and eventually the front sight blurs while the target stays sharp.</p></article>
+    <article class="card"><h3>Astigmatism (cylinder)</h3><span class="rxs">cylinder × axis</span>
+      <p>The eye has different power in different directions, so edges blur in one direction: the sides of the front post can be crisp while its top smears. A red dot turns into a line or a comet.</p></article>
+    <article class="card"><h3>Anisometropia</h3><span class="rxs">different R / L</span>
+      <p>The eyes need different corrections but always focus by the same amount. When the dominant eye has a sharp front sight, the other eye sees something else entirely. With both eyes open the brain usually picks the dominant eye's image.</p></article>
+    <article class="card"><h3>Red dot</h3><span class="rxs">dot ≈ infinity</span>
+      <p>The dot sits optically far away, in the same focus as the target. One distance, no fight between front sight and target. That's why a dot helps many people with little focus range. Astigmatism still makes the dot star-shaped.</p></article>
+    <article class="card"><h3>A small pupil helps</h3><span class="rxs">pupil 2–7 mm</span>
+      <p>Blur grows with the pupil. In bright light the pupil shrinks and more distances look sharp at once. That's why precision shooters may use an iris aperture in front of the eye.</p></article>
   </section>
 
   <footer>
-    <p><b>Forenklet modell.</b> Uskarphet er beregnet som avstanden i dioptrier mellom det øyet fokuserer på og hvert objekt, ganget med pupillen. Den tar ikke med bildestørrelse, aberrasjoner eller at hjernen kan undertrykke ett øye. Retningen på astigmatismen er omtrentlig, og alderen er et snitt; folk varierer mye.</p>
-    <p>Dette er ikke en synstest. Lurer du på ditt eget siktebilde, ta med pistolen (eller avstandene) til en optiker.</p>
+    <p><b>Simplified model.</b> Blur is the distance in dioptres between where the eye focuses and each object, times the pupil size. It ignores image size, aberrations and the brain suppressing one eye. The astigmatism direction is approximate, and ages are averages; people vary a lot.</p>
+    <p>Not a vision test. If you wonder about your own sight picture, bring the pistol (or the distances) to an optician.</p>
   </footer>
 </div>
 
@@ -159,21 +159,21 @@ footer p{margin:0}
   const CX = 320, AIM_Y = 228;
 
   const PRESETS = [
-    { id:"mine",    name:"Mitt syn",           amp:4,   R:[-0.75,-1.25,175], L:[1.75,-0.75,165] },
-    { id:"normal",  name:"Normalt syn, 25 år", amp:9,   R:[0,0,0],       L:[0,0,0] },
-    { id:"presby",  name:"Aldersyn, 55 år",    amp:1,   R:[0,0,0],       L:[0,0,0] },
-    { id:"myo15",   name:"Nærsynt −1,5",       amp:7,   R:[-1.5,0,0],    L:[-1.5,0,0] },
-    { id:"myo4",    name:"Nærsynt −4",         amp:7,   R:[-4,0,0],      L:[-4,0,0] },
-    { id:"hyp",     name:"Langsynt +2, 45 år", amp:3.5, R:[2,0,0],       L:[2,0,0] },
-    { id:"astig",   name:"Astigmatisme −1,5",  amp:7,   R:[0,-1.5,180],  L:[0,-1.5,180] },
-    { id:"aniso",   name:"Anisometropi",       amp:6,   R:[-1.25,0,0],   L:[1.5,0,0] },
+    { id:"mine",    name:"Mine (aniso + astig)", amp:4,   R:[-0.75,-1.25,175], L:[1.75,-0.75,165] },
+    { id:"normal",  name:"Normal, age 25", amp:9,   R:[0,0,0],       L:[0,0,0] },
+    { id:"presby",  name:"Presbyopia, age 55",    amp:1,   R:[0,0,0],       L:[0,0,0] },
+    { id:"myo15",   name:"Nearsighted −1.5",       amp:7,   R:[-1.5,0,0],    L:[-1.5,0,0] },
+    { id:"myo4",    name:"Nearsighted −4",         amp:7,   R:[-4,0,0],      L:[-4,0,0] },
+    { id:"hyp",     name:"Farsighted +2, age 45", amp:3.5, R:[2,0,0],       L:[2,0,0] },
+    { id:"astig",   name:"Astigmatism only",  amp:7,   R:[0,-1.5,180],  L:[0,-1.5,180] },
+    { id:"aniso",   name:"Anisometropia only",       amp:6,   R:[-1.25,0,0],   L:[1.5,0,0] },
   ];
 
   const st = { preset:null, amp:9, pupil:4, dist:10, sight:"irons", focus:"near", dom:"R", corrected:false,
                eye:{ R:{sph:0,cyl:0,axis:0}, L:{sph:0,cyl:0,axis:0} } };
 
   const $ = (s, r=document) => r.querySelector(s);
-  const fmtD = v => (v>0?"+":v<0?"−":"±") + Math.abs(v).toFixed(2).replace(".", ",");
+  const fmtD = v => (v>0?"+":v<0?"−":"±") + Math.abs(v).toFixed(2);
   const deg = (m, d) => Math.atan(m / d) * 180 / Math.PI * PPD; // metres at distance -> px
 
   function applyPreset(p){
@@ -194,10 +194,10 @@ footer p{margin:0}
   // Rx editors
   for (const k of ["R","L"]) {
     const box = $("#rx-"+k);
-    box.innerHTML = `<h3>${k==="R"?"Høyre øye":"Venstre øye"}</h3>
-      <div class="row"><label for="sph-${k}">Sfære</label><input id="sph-${k}" type="range" min="-6" max="4" step="0.25"><output id="sphO-${k}"></output></div>
-      <div class="row"><label for="cyl-${k}">Sylinder</label><input id="cyl-${k}" type="range" min="-4" max="0" step="0.25"><output id="cylO-${k}"></output></div>
-      <div class="row"><label for="ax-${k}">Akse</label><input id="ax-${k}" type="range" min="0" max="180" step="5"><output id="axO-${k}"></output></div>`;
+    box.innerHTML = `<h3>${k==="R"?"Right eye":"Left eye"}</h3>
+      <div class="row"><label for="sph-${k}">Sphere</label><input id="sph-${k}" type="range" min="-6" max="4" step="0.25"><output id="sphO-${k}"></output></div>
+      <div class="row"><label for="cyl-${k}">Cylinder</label><input id="cyl-${k}" type="range" min="-4" max="0" step="0.25"><output id="cylO-${k}"></output></div>
+      <div class="row"><label for="ax-${k}">Axis</label><input id="ax-${k}" type="range" min="0" max="180" step="5"><output id="axO-${k}"></output></div>`;
     for (const f of ["sph","cyl","ax"]) {
       $(`#${f}-${k}`).addEventListener("input", e => {
         const v = parseFloat(e.target.value);
@@ -233,8 +233,8 @@ footer p{margin:0}
   function layers(){
     const far = -1 / st.dist;
     return st.sight === "irons"
-      ? [ {id:"target", name:"Blinken", V:far}, {id:"front", name:"Kornet", V:-1/D_FRONT}, {id:"rear", name:"Bakre sikte", V:-1/D_REAR} ]
-      : [ {id:"target", name:"Blinken", V:far}, {id:"dot", name:"Punktet", V:0}, {id:"frame", name:"Optikkvinduet", V:-1/D_FRAME} ];
+      ? [ {id:"target", name:"Target", V:far}, {id:"front", name:"Front sight", V:-1/D_FRONT}, {id:"rear", name:"Rear sight", V:-1/D_REAR} ]
+      : [ {id:"target", name:"Target", V:far}, {id:"dot", name:"Dot", V:0}, {id:"frame", name:"Optic window", V:-1/D_FRAME} ];
   }
   function accommodation(){
     const [m1, m2] = meridians(st.dom);
@@ -245,10 +245,10 @@ footer p{margin:0}
   }
   const sdFor = d => st.pupil * d * 1.02;  // px std-dev for defocus d (dioptres)
   function quality(d){
-    if (d < 0.25) return ["skarp", 0];
-    if (d < 0.75) return ["litt uskarp", 1];
-    if (d < 1.5)  return ["uskarp", 2];
-    return ["svært uskarp", 3];
+    if (d < 0.25) return ["sharp", 0];
+    if (d < 0.75) return ["slightly blurred", 1];
+    if (d < 1.5)  return ["blurred", 2];
+    return ["very blurred", 3];
   }
 
   // Scene SVG
@@ -320,16 +320,16 @@ footer p{margin:0}
     for (const l of L) {
       const d1 = Math.abs(l.V - (m1 - acc.A)), d2 = Math.abs(l.V - (m2 - acc.A));
       const d = Math.max(d1, d2), [q, s] = quality(d);
-      const dir = Math.abs(d1 - d2) >= 0.25 ? " · retning" : "";
-      rows.push(`<span class="k">${l.name}</span><span class="q s${s}">${q}${dir}</span><span class="v">${d.toFixed(2).replace(".",",")} D</span>`);
+      const dir = Math.abs(d1 - d2) >= 0.25 ? " · directional" : "";
+      rows.push(`<span class="k">${l.name}</span><span class="q s${s}">${q}${dir}</span><span class="v">${d.toFixed(2)} D</span>`);
     }
     const isDom = st.dom === k;
     const e = st.eye[k];
-    const rxText = st.corrected ? "korrigert" : `${fmtD(e.sph)} ${e.cyl ? fmtD(e.cyl)+" × "+e.axis+"°" : ""}`;
+    const rxText = st.corrected ? "corrected" : `${fmtD(e.sph)} ${e.cyl ? fmtD(e.cyl)+" × "+e.axis+"°" : ""}`;
     $("#eye-"+k).innerHTML = `
-      <div class="eye-head"><h2>${k==="R"?"Høyre øye":"Venstre øye"}</h2>
+      <div class="eye-head"><h2>${k==="R"?"Right eye":"Left eye"}</h2>
         <span class="tag">${isDom ? "dominant · " : ""}${rxText}</span></div>
-      <div class="scene"><svg viewBox="0 0 640 420" role="img" aria-label="Siktebilde, ${k==="R"?"høyre":"venstre"} øye">
+      <div class="scene"><svg viewBox="0 0 640 420" role="img" aria-label="Sight picture, ${k==="R"?"right":"left"} eye">
         <defs>${defs.join("")}</defs>
         <rect width="640" height="420" fill="var(--scene-sky)"/>
         <rect y="300" width="640" height="120" fill="var(--scene-berm)" opacity=".55"/>
@@ -340,12 +340,12 @@ footer p{margin:0}
 
   function render(){
     // controls state
-    $("#ampOut").textContent = st.amp.toFixed(2).replace(".",",") + " D";
+    $("#ampOut").textContent = st.amp.toFixed(2) + " D";
     const age = Math.round(Math.min(70, Math.max(10, (18.5 - st.amp) / 0.3)));
-    $("#ageHint").textContent = st.amp <= 0.5 ? "Omtrent som et øye på 60+ år." : `Omtrent som et snittøye på ${age} år.`;
-    $("#pupilOut").textContent = st.pupil.toFixed(1).replace(".",",") + " mm";
+    $("#ageHint").textContent = st.amp <= 0.5 ? "Roughly an eye aged 60+." : `Roughly an average eye aged ${age}.`;
+    $("#pupilOut").textContent = st.pupil.toFixed(1) + " mm";
     $("#distOut").textContent = st.dist + " m";
-    $("#focusNear").textContent = st.sight === "irons" ? "Kornet" : "Vinduet";
+    $("#focusNear").textContent = st.sight === "irons" ? "Front sight" : "Window";
     for (const [seg, key] of [["#segSight","sight"],["#segFocus","focus"]])
       $(seg).querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === st[key])));
     document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", String(c.dataset.id === st.preset)));
@@ -360,11 +360,11 @@ footer p{margin:0}
     const acc = accommodation();
     renderEye("R", acc); renderEye("L", acc);
 
-    const target = st.focus === "near" ? (st.sight === "irons" ? "kornet" : "vinduet") : "blinken";
-    let msg = `Begge øyne fokuserer like mye. Det dominante øyet styrer: det bruker <b>${acc.A.toFixed(2).replace(".",",")} D</b> fokusevne for å se ${target}.`;
-    if (acc.need > st.amp + 0.01) msg += ` <b>Rekker ikke:</b> det mangler ${(acc.need - st.amp).toFixed(2).replace(".",",")} D, så ${target} blir uskarpt.`;
-    else if (acc.need < -0.01) msg += ` Øyet er nærsynt nok til at ${target} ligger innenfor uten å fokusere.`;
-    else if (acc.need > 0.75 * st.amp && acc.need > 0.5) msg += ` Det er nær grensen, så det blir slitsomt over tid.`;
+    const target = st.focus === "near" ? (st.sight === "irons" ? "the front sight" : "the optic window") : "the target";
+    let msg = `Both eyes focus by the same amount, set by the dominant eye: it uses <b>${acc.A.toFixed(2)} D</b> of focus to see ${target}.`;
+    if (acc.need > st.amp + 0.01) msg += ` <b>Out of range:</b> ${(acc.need - st.amp).toFixed(2)} D short, so ${target} stays blurred.`;
+    else if (acc.need < -0.01) msg += ` The eye is nearsighted enough to see ${target} without focusing at all.`;
+    else if (acc.need > 0.75 * st.amp && acc.need > 0.5) msg += ` That is near the limit, so it gets tiring over time.`;
     $("#accNote").innerHTML = msg;
   }
 
