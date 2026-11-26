@@ -120,14 +120,16 @@ footer p{margin:0}
         <div class="row"><label for="dom">Dominant</label>
           <select id="dom"><option value="R">Right eye</option><option value="L">Left eye</option></select><span></span></div>
         <label class="check"><input type="checkbox" id="corr"> Wearing glasses or contacts (corrected)</label>
+        <div class="row"><label for="accuracy">Correction</label><input id="accuracy" type="range" min="50" max="100" step="5"><output id="accuracyOut"></output></div>
       </fieldset>
       <fieldset>
         <legend>Slipping focus</legend>
         <button type="button" id="slipBtn" class="chip" aria-pressed="false">Play slipping focus</button>
         <div class="row"><label for="slipMode">Drifts to</label>
           <select id="slipMode"><option value="eyes">Other eye's focus</option><option value="relax">Relaxed (fatigue)</option></select><span></span></div>
+        <div class="row"><label for="wobble">Wobble</label><input id="wobble" type="range" min="0" max="0.8" step="0.05"><output id="wobbleOut"></output></div>
         <div class="row"><label for="slipHold">Holds for</label><input id="slipHold" type="range" min="0.4" max="3" step="0.1" value="1"><output id="slipHoldOut">1.0 s</output></div>
-        <p class="note">A hypothesis: with one eye minus and one plus, the eyes ask for different focus, and the shared focus hunts between them.</p>
+        <p class="note">A hypothesis: with one eye minus and one plus, the eyes ask for different focus, and the shared focus hunts between them. Wobble is the natural focus jitter; it grows the harder the eye has to focus, so it hits the front sight far more than the target. Glasses never correct perfectly: “Correction” sets how much of the prescription they fix.</p>
       </fieldset>
       <fieldset>
         <legend>Prescription</legend>
@@ -151,7 +153,7 @@ footer p{margin:0}
     <article class="card"><h3>Red dot</h3><span class="rxs">dot ≈ infinity</span>
       <p>The dot sits optically far away, in the same focus as the target. One distance, no fight between front sight and target. That's why a dot helps many people with little focus range. Astigmatism still makes the dot star-shaped.</p></article>
     <article class="card"><h3>Slipping focus (hypothesis)</h3><span class="rxs">one eye −, one eye +</span>
-      <p>Both eyes share one focus. When one eye is nearsighted and the other farsighted, the front sight needs almost no focus for one eye and a lot for the other. Blur in either eye can pull the focus, so it may hunt: sharp for a moment, then drifting. Ask an optician or orthoptist; this page only illustrates the idea.</p></article>
+      <p>Both eyes share one focus. When one eye is nearsighted and the other farsighted, the front sight needs almost no focus for one eye and a lot for the other. Blur in either eye can pull the focus, so it may hunt: sharp for a moment, then drifting. Glasses help but never correct 100 %: a small difference between the eyes remains, and focus naturally wobbles more the harder it works. So front-sight focus can stay unstable while target focus, which needs almost no effort, holds. Ask an optician or orthoptist; this page only illustrates the idea.</p></article>
     <article class="card"><h3>A small pupil helps</h3><span class="rxs">pupil 2–7 mm</span>
       <p>Blur grows with the pupil. In bright light the pupil shrinks and more distances look sharp at once. That's why precision shooters may use an iris aperture in front of the eye.</p></article>
   </section>
@@ -179,7 +181,7 @@ footer p{margin:0}
     { id:"aniso",   name:"Anisometropia only",       amp:6,   R:[-1.25,0,0],   L:[1.5,0,0] },
   ];
 
-  const st = { preset:null, amp:9, pupil:4, dist:10, sight:"irons", focus:"near", dom:"R", corrected:false,
+  const st = { preset:null, amp:9, pupil:4, dist:10, sight:"irons", focus:"near", dom:"R", corrected:false, accuracy:85, wobble:0.4,
                eye:{ R:{sph:0,cyl:0,axis:0}, L:{sph:0,cyl:0,axis:0} } };
 
   const $ = (s, r=document) => r.querySelector(s);
@@ -222,6 +224,7 @@ footer p{margin:0}
   $("#slipHold").addEventListener("input", e => { $("#slipHoldOut").textContent = parseFloat(e.target.value).toFixed(1) + " s"; });
   $("#dom").addEventListener("change", e => { st.dom = e.target.value; render(); });
   $("#corr").addEventListener("change", e => { st.corrected = e.target.checked; render(); });
+  bindRange("accuracy","accuracy"); bindRange("wobble","wobble");
   for (const [seg, key] of [["#segSight","sight"],["#segFocus","focus"]]) {
     $(seg).addEventListener("click", e => {
       const b = e.target.closest("button"); if (!b) return;
@@ -231,7 +234,7 @@ footer p{margin:0}
 
   function syncControls(){
     $("#amp").value = st.amp; $("#pupil").value = st.pupil; $("#dist").value = st.dist;
-    $("#dom").value = st.dom; $("#corr").checked = st.corrected;
+    $("#dom").value = st.dom; $("#corr").checked = st.corrected; $("#accuracy").value = st.accuracy; $("#wobble").value = st.wobble;
     for (const k of ["R","L"]) {
       $(`#sph-${k}`).value = st.eye[k].sph; $(`#cyl-${k}`).value = st.eye[k].cyl; $(`#ax-${k}`).value = st.eye[k].axis;
     }
@@ -239,8 +242,9 @@ footer p{margin:0}
 
   // Optics
   function meridians(k){
-    if (st.corrected) return [0,0];
-    const e = st.eye[k]; return [e.sph, e.sph + e.cyl];
+    const e = st.eye[k];
+    const r = st.corrected ? 1 - st.accuracy / 100 : 1;   // glasses leave a residual error
+    return [e.sph * r, (e.sph + e.cyl) * r];
   }
   function layers(){
     const far = -1 / st.dist;
@@ -284,7 +288,10 @@ footer p{margin:0}
       else if (t < cyc[0]+cyc[1]) f = ease((t - cyc[0]) / cyc[1]);
       else if (t < cyc[0]+cyc[1]+cyc[2]) f = 1;
       else f = 1 - ease((t - cyc[0]-cyc[1]-cyc[2]) / cyc[3]);
-      anim.A = a0 + (a1 - a0) * f;
+      const ts_ = (ts - anim.t0) / 1000;
+      const load = Math.min(1.5, a0 / 1.43 + 0.15);   // wobble grows with how hard the eye focuses
+      const wob = st.wobble * load * (0.6 * Math.sin(2*Math.PI*0.9*ts_) + 0.4 * Math.sin(2*Math.PI*2.3*ts_ + 1.3));
+      anim.A = Math.min(Math.max(a0 + (a1 - a0) * f + wob, 0), st.amp);
       render();
     }
     anim.raf = requestAnimationFrame(animFrame);
@@ -360,7 +367,7 @@ footer p{margin:0}
 
   function renderEye(k, acc){
     const [m1, m2] = meridians(k);
-    const axis = st.corrected ? 0 : st.eye[k].axis;
+    const axis = st.eye[k].axis;
     const L = layers();
     const content = { target: targetShape(), front: frontSight(), rear: rearSight(), frame: frame(), dot: dot() };
     const defs = [], bodies = [], rows = [];
@@ -381,7 +388,7 @@ footer p{margin:0}
     }
     const isDom = st.dom === k;
     const e = st.eye[k];
-    const rxText = st.corrected ? "corrected" : `${fmtD(e.sph)} ${e.cyl ? fmtD(e.cyl)+" × "+e.axis+"°" : ""}`;
+    const rxText = st.corrected ? `corrected ${st.accuracy}%` : `${fmtD(e.sph)} ${e.cyl ? fmtD(e.cyl)+" × "+e.axis+"°" : ""}`;
     $("#eye-"+k).innerHTML = `
       <div class="eye-head"><h2>${k==="R"?"Right eye":"Left eye"}</h2>
         <span class="tag">${isDom ? "dominant · " : ""}${rxText}</span></div>
@@ -400,6 +407,8 @@ footer p{margin:0}
     const age = Math.round(Math.min(70, Math.max(10, (18.5 - st.amp) / 0.3)));
     $("#ageHint").textContent = st.amp <= 0.5 ? "Roughly an eye aged 60+." : `Roughly an average eye aged ${age}.`;
     $("#pupilOut").textContent = st.pupil.toFixed(1) + " mm";
+    $("#accuracyOut").textContent = st.accuracy + " %";
+    $("#wobbleOut").textContent = "±" + st.wobble.toFixed(2) + " D";
     $("#distOut").textContent = st.dist + " m";
     $("#focusNear").textContent = st.sight === "irons" ? "Front sight" : "Window";
     for (const [seg, key] of [["#segSight","sight"],["#segFocus","focus"]])
@@ -410,7 +419,7 @@ footer p{margin:0}
       $(`#sphO-${k}`).textContent = fmtD(e.sph);
       $(`#cylO-${k}`).textContent = fmtD(e.cyl);
       $(`#axO-${k}`).textContent = e.axis + "°";
-      for (const f of ["sph","cyl","ax"]) $(`#${f}-${k}`).disabled = st.corrected;
+
     }
 
     const acc = accommodation();
