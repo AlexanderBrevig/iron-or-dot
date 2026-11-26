@@ -124,9 +124,9 @@ footer p{margin:0}
         <legend>Slipping focus</legend>
         <button type="button" id="slipBtn" class="chip" aria-pressed="false">Play slipping focus</button>
         <div class="row"><label for="slipMode">Drifts to</label>
-          <select id="slipMode"><option value="eyes">Other eye's focus</option><option value="relax">Relaxed (fatigue)</option></select><span></span></div>
-        <div class="row"><label for="wobble">Wobble</label><input id="wobble" type="range" min="0" max="0.8" step="0.05"><output id="wobbleOut"></output></div>
-        <div class="row"><label for="slipHold">Holds for</label><input id="slipHold" type="range" min="0.4" max="3" step="0.1" value="1"><output id="slipHoldOut">1.0 s</output></div>
+          <select id="slipMode"><option value="eyes">Other eye's focus</option><option value="relax" selected>Relaxed (fatigue)</option></select><span></span></div>
+        <div class="row"><label for="wobble">Wobble</label><input id="wobble" type="range" min="0" max="1.5" step="0.05"><output id="wobbleOut"></output></div>
+        <div class="row"><label for="slipHold">Holds for</label><input id="slipHold" type="range" min="0.2" max="3" step="0.1" value="0.3"><output id="slipHoldOut">0.3 s</output></div>
         <p class="note">A hypothesis: with one eye minus and one plus, the eyes ask for different focus, and the shared focus hunts between them. Wobble is the natural focus jitter; it grows the harder the eye has to focus, so it hits the front sight far more than the target. Glasses never correct perfectly: “Correction” sets how much of the prescription they fix.</p>
       </fieldset>
       <fieldset>
@@ -179,7 +179,7 @@ footer p{margin:0}
     { id:"aniso",   name:"Anisometropia only",       amp:6,   R:[-1.25,0,0],   L:[1.5,0,0] },
   ];
 
-  const st = { preset:null, amp:9, pupil:4, dist:10, sight:"irons", focus:"near", dom:"R", corrected:false, accuracy:85, wobble:0.4, view:"both", dominance:80,
+  const st = { preset:null, amp:9, pupil:4, dist:10, sight:"irons", focus:"near", dom:"R", corrected:false, accuracy:85, wobble:1.2, view:"both", dominance:80,
                eye:{ R:{sph:0,cyl:0,axis:0}, L:{sph:0,cyl:0,axis:0} } };
 
   const $ = (s, r=document) => r.querySelector(s);
@@ -472,5 +472,6 @@ footer p{margin:0}
   }
 
   applyPreset(PRESETS[0]);
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) setAnim(true);
 })();
 </script>
