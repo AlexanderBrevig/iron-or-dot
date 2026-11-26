@@ -252,7 +252,10 @@ footer p{margin:0}
     const w = Math.max(0.6, s*0.25).toFixed(2);
     return `<polygon points="${outline}" fill="var(--scene-card)"/>
       <polygon points="${cz}" fill="none" stroke="var(--scene-ink)" stroke-width="${w}" stroke-dasharray="${(s*1.2).toFixed(1)} ${(s*0.8).toFixed(1)}" opacity=".7"/>
-      <polygon points="${az}" fill="none" stroke="var(--scene-ink)" stroke-width="${w}" stroke-dasharray="${(s*1.2).toFixed(1)} ${(s*0.8).toFixed(1)}" opacity=".85"/>`;
+      <polygon points="${az}" fill="none" stroke="var(--scene-ink)" stroke-width="${w}" stroke-dasharray="${(s*1.2).toFixed(1)} ${(s*0.8).toFixed(1)}" opacity=".85"/>
+      <text x="${(ox+22.5*s).toFixed(1)}" y="${(oy+8*s).toFixed(1)}" font-size="${(4.5*s).toFixed(1)}" font-family="Arial,sans-serif" font-weight="700" text-anchor="middle" fill="var(--scene-ink)">A</text>
+      <rect x="${(ox+19*s).toFixed(1)}" y="${(oy+21*s).toFixed(1)}" width="${(2.5*s).toFixed(1)}" height="${(2.5*s).toFixed(1)}" fill="#1b1b1b"/>
+      <rect x="${(ox+25*s).toFixed(1)}" y="${(oy+12*s).toFixed(1)}" width="${(2.5*s).toFixed(1)}" height="${(2.5*s).toFixed(1)}" fill="#b08f62"/>`;
   }
   function frontSight(){
     const w = deg(0.0033, D_FRONT), h = deg(0.009, D_FRONT);
@@ -352,7 +355,11 @@ footer p{margin:0}
     const target = st.focus === "near" ? (st.sight === "irons" ? "the front sight" : "the optic window") : "the target";
     let msg = `Both eyes focus by the same amount, set by the dominant eye: it uses <b>${acc.A.toFixed(2)} D</b> of focus to see ${target}.`;
     if (acc.need > st.amp + 0.01) msg += ` <b>Out of range:</b> ${(acc.need - st.amp).toFixed(2)} D short, so ${target} stays blurred.`;
-    else if (acc.need < -0.01) msg += ` The eye is nearsighted enough to see ${target} without focusing at all.`;
+    else if (acc.need < -0.25) {
+      const se = (meridians(st.dom)[0] + meridians(st.dom)[1]) / 2;
+      msg += ` <b>Beyond reach:</b> the dominant eye is nearsighted, so its sharpest point is ${Math.round(100 / -se)} cm away even fully relaxed. Nothing farther can get sharp, so ${target} stays blurred and switching focus changes little. Tick “Wearing glasses” to compare.`;
+    }
+    else if (acc.need < -0.01) msg += ` The eye is nearsighted enough to see ${target} with a fully relaxed eye.`;
     else if (acc.need > 0.75 * st.amp && acc.need > 0.5) msg += ` That is near the limit, so it gets tiring over time.`;
     $("#accNote").innerHTML = msg;
   }
