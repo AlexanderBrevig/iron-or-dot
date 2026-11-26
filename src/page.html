@@ -1,0 +1,362 @@
+<title>Korn, hakk og dioptrier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a range-bench instrument. Scene panels (one per eye) on the left, the optician's controls on the right; stacks on phones. */
+:root{
+  --bg:#edf1f2; --panel:#ffffff; --fg:#141a1d; --muted:#57646a; --line:#cdd5d8;
+  --accent:#d9481f; --accent-soft:#f6ddd4; --good:#2f7d4f; --warn:#b26a00; --bad:#b3261e;
+  --scene-sky:#c9cfc8; --scene-berm:#8c7b63; --scene-card:#c8a77a; --scene-ink:#7a5f3c;
+  --scene-steel:#101315; --scene-glass:rgba(120,150,170,.10); --scene-dot:#ff2a17;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1416; --panel:#172024; --fg:#e6ecee; --muted:#97a4aa; --line:#2a363b;
+  --accent:#ff7b4f; --accent-soft:#3a2219; --good:#5cc489; --warn:#e0a33c; --bad:#ff7a70; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1416; --panel:#172024; --fg:#e6ecee; --muted:#97a4aa; --line:#2a363b;
+  --accent:#ff7b4f; --accent-soft:#3a2219; --good:#5cc489; --warn:#e0a33c; --bad:#ff7a70; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:28px 48px;display:grid;gap:22px}
+header{display:grid;gap:6px;max-width:72ch}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(2rem,5vw,3rem);line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
+h1 span{color:var(--accent)}
+.lede{color:var(--muted);margin:0}
+.presets{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 .92rem var(--f-body);padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+@media (max-width:900px){.main{grid-template-columns:minmax(0,1fr)}}
+.eyes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:640px){.eyes{grid-template-columns:minmax(0,1fr)}}
+.eye{display:grid;gap:8px;min-width:0}
+.eye-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.eye-head h2{font-family:var(--f-display);font-weight:600;font-size:1.35rem;margin:0;letter-spacing:.02em}
+.tag{font:600 .72rem var(--f-body);text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+.scene{width:100%;aspect-ratio:640/420;border-radius:10px;overflow:hidden;background:var(--scene-sky);border:1px solid var(--line)}
+.scene svg{display:block;width:100%;height:100%}
+.readout{display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;font-size:.9rem;align-items:baseline}
+.readout .k{color:var(--muted)}
+.readout .v{font-family:var(--f-mono);font-size:.82rem;text-align:right;font-variant-numeric:tabular-nums}
+.q{font-weight:600}
+.q.s0{color:var(--good)}.q.s1{color:var(--warn)}.q.s2,.q.s3{color:var(--bad)}
+.note{font-size:.88rem;color:var(--muted);margin:0}
+.note b{color:var(--fg)}
+aside{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:16px}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:10px;min-width:0}
+legend{font:600 .75rem var(--f-body);text-transform:uppercase;letter-spacing:.09em;color:var(--muted);padding:0;margin-bottom:4px}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{font:600 .9rem var(--f-body);padding:7px 6px;border:0;background:transparent;color:var(--fg);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
+.row{display:grid;grid-template-columns:5.2rem minmax(0,1fr) 4.4rem;gap:8px;align-items:center;font-size:.92rem}
+.row output{font-family:var(--f-mono);font-size:.82rem;text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.rx{display:grid;gap:6px;padding:10px;border:1px dashed var(--line);border-radius:8px}
+.rx h3{margin:0;font:600 .95rem var(--f-body)}
+label.check{display:flex;gap:8px;align-items:center;font-size:.95rem;cursor:pointer}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:6px;align-content:start}
+.card h3{margin:0;font-family:var(--f-display);font-weight:600;font-size:1.25rem;letter-spacing:.02em}
+.card p{margin:0;font-size:.95rem}
+.card .rxs{font-family:var(--f-mono);font-size:.78rem;color:var(--accent)}
+footer{color:var(--muted);font-size:.85rem;max-width:80ch;display:grid;gap:6px}
+footer p{margin:0}
+@media (prefers-reduced-motion:no-preference){.chip,.seg button{transition:background .15s,color .15s}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Korn, hakk og <span>dioptrier</span></h1>
+    <p class="lede">Slik kan siktebildet se ut med ulike brillestyrker. Øyet har skarpt fokus på én avstand om gangen: bakre sikte ligger ca. 55 cm unna, kornet ca. 70 cm og blinken 5–25 m. Velg et eksempel eller skru på styrken selv.</p>
+  </header>
+
+  <div class="presets" id="presets" role="group" aria-label="Eksempler"></div>
+
+  <div class="main">
+    <section class="eyes" aria-label="Siktebilde per øye">
+      <div class="eye" id="eye-R"></div>
+      <div class="eye" id="eye-L"></div>
+      <p class="note" id="accNote" style="grid-column:1/-1"></p>
+    </section>
+
+    <aside aria-label="Innstillinger">
+      <fieldset>
+        <legend>Sikte</legend>
+        <div class="seg" id="segSight">
+          <button type="button" data-v="irons" aria-pressed="true">Åpne sikter</button>
+          <button type="button" data-v="dot" aria-pressed="false">Rødpunkt</button>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Fokuser på</legend>
+        <div class="seg" id="segFocus">
+          <button type="button" data-v="near" aria-pressed="true" id="focusNear">Kornet</button>
+          <button type="button" data-v="far" aria-pressed="false">Blinken</button>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Øyne og alder</legend>
+        <div class="row"><label for="amp">Fokusevne</label><input id="amp" type="range" min="0" max="10" step="0.25"><output id="ampOut"></output></div>
+        <p class="note" id="ageHint" style="margin-top:-4px"></p>
+        <div class="row"><label for="pupil">Pupille</label><input id="pupil" type="range" min="2" max="7" step="0.5"><output id="pupilOut"></output></div>
+        <div class="row"><label for="dist">Blink</label><input id="dist" type="range" min="5" max="25" step="1"><output id="distOut"></output></div>
+        <div class="row"><label for="dom">Dominant</label>
+          <select id="dom"><option value="R">Høyre øye</option><option value="L">Venstre øye</option></select><span></span></div>
+        <label class="check"><input type="checkbox" id="corr"> Med briller eller linser (korrigert)</label>
+      </fieldset>
+      <fieldset>
+        <legend>Styrke (brilleseddel)</legend>
+        <div class="rx" id="rx-R"></div>
+        <div class="rx" id="rx-L"></div>
+      </fieldset>
+    </aside>
+  </div>
+
+  <section class="cards" aria-label="Forklaring">
+    <article class="card"><h3>Nærsynt (minus)</h3><span class="rxs">sfære −</span>
+      <p>Uten briller ligger det skarpe punktet nært: ved −1,5 rundt 67 cm, altså omtrent ved kornet. Kornet blir skarpt nesten gratis, mens blinken blir uskarp. Ved −4 ligger det skarpe punktet på 25 cm, og da er alt i siktebildet uskarpt.</p></article>
+    <article class="card"><h3>Langsynt (pluss)</h3><span class="rxs">sfære +</span>
+      <p>Øyet må bruke fokusevne bare for å se langt. Unge øyne klarer det, men kornet krever enda mer. Med alderen tar fokusevnen slutt, og kornet blir uskarpt først.</p></article>
+    <article class="card"><h3>Aldersyn</h3><span class="rxs">fokusevne ↓</span>
+      <p>Fokusevnen synker gjennom hele livet. Kornet på 70 cm trenger 1,4 dioptrier. Rundt 50 år begynner det å gå tregt, og etter hvert blir kornet uskarpt mens blinken fortsatt er skarp.</p></article>
+    <article class="card"><h3>Astigmatisme (sylinder)</h3><span class="rxs">sylinder × akse</span>
+      <p>Øyet har ulik styrke i ulike retninger. Da blir kanter uskarpe i én retning: sidene på kornet kan være skarpe mens toppen flyter ut. Et rødpunkt blir til en strek eller en komet.</p></article>
+    <article class="card"><h3>Anisometropi</h3><span class="rxs">ulik styrke H / V</span>
+      <p>Øynene trenger ulik styrke, men fokuserer alltid like mye. Når det dominante øyet har skarpt korn, ser det andre øyet noe helt annet. Med begge øyne åpne velger hjernen som regel bildet fra det dominante øyet.</p></article>
+    <article class="card"><h3>Rødpunkt</h3><span class="rxs">punkt ≈ uendelig</span>
+      <p>Punktet ligger optisk langt unna, i samme fokus som blinken. Da trenger du bare én avstand, ingen kamp mellom korn og blink. Derfor hjelper rødpunkt mange med svak fokusevne. Astigmatisme gjør likevel punktet stjerneformet.</p></article>
+    <article class="card"><h3>Liten pupille hjelper</h3><span class="rxs">pupille 2–7 mm</span>
+      <p>Uskarphet vokser med pupillen. I sterkt lys blir pupillen liten og flere avstander ser skarpe ut samtidig. Det er derfor presisjonsskyttere kan bruke en blender (iris) foran øyet.</p></article>
+  </section>
+
+  <footer>
+    <p><b>Forenklet modell.</b> Uskarphet er beregnet som avstanden i dioptrier mellom det øyet fokuserer på og hvert objekt, ganget med pupillen. Den tar ikke med bildestørrelse, aberrasjoner eller at hjernen kan undertrykke ett øye. Retningen på astigmatismen er omtrentlig, og alderen er et snitt; folk varierer mye.</p>
+    <p>Dette er ikke en synstest. Lurer du på ditt eget siktebilde, ta med pistolen (eller avstandene) til en optiker.</p>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const D_REAR = 0.55, D_FRONT = 0.70, D_FRAME = 0.62;
+  const PPD = 71;                 // pixels per degree in the 640 px scene
+  const CX = 320, AIM_Y = 228;
+
+  const PRESETS = [
+    { id:"mine",    name:"Mitt syn",           amp:4,   R:[-0.75,-1.25,175], L:[1.75,-0.75,165] },
+    { id:"normal",  name:"Normalt syn, 25 år", amp:9,   R:[0,0,0],       L:[0,0,0] },
+    { id:"presby",  name:"Aldersyn, 55 år",    amp:1,   R:[0,0,0],       L:[0,0,0] },
+    { id:"myo15",   name:"Nærsynt −1,5",       amp:7,   R:[-1.5,0,0],    L:[-1.5,0,0] },
+    { id:"myo4",    name:"Nærsynt −4",         amp:7,   R:[-4,0,0],      L:[-4,0,0] },
+    { id:"hyp",     name:"Langsynt +2, 45 år", amp:3.5, R:[2,0,0],       L:[2,0,0] },
+    { id:"astig",   name:"Astigmatisme −1,5",  amp:7,   R:[0,-1.5,180],  L:[0,-1.5,180] },
+    { id:"aniso",   name:"Anisometropi",       amp:6,   R:[-1.25,0,0],   L:[1.5,0,0] },
+  ];
+
+  const st = { preset:null, amp:9, pupil:4, dist:10, sight:"irons", focus:"near", dom:"R", corrected:false,
+               eye:{ R:{sph:0,cyl:0,axis:0}, L:{sph:0,cyl:0,axis:0} } };
+
+  const $ = (s, r=document) => r.querySelector(s);
+  const fmtD = v => (v>0?"+":v<0?"−":"±") + Math.abs(v).toFixed(2).replace(".", ",");
+  const deg = (m, d) => Math.atan(m / d) * 180 / Math.PI * PPD; // metres at distance -> px
+
+  function applyPreset(p){
+    st.preset = p.id; st.amp = p.amp; st.corrected = false;
+    for (const k of ["R","L"]) { const [s,c,a] = p[k]; st.eye[k] = {sph:s, cyl:c, axis:a}; }
+    syncControls(); render();
+  }
+
+  // Build preset chips
+  const pWrap = $("#presets");
+  PRESETS.forEach(p => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.textContent = p.name; b.dataset.id = p.id;
+    b.addEventListener("click", () => applyPreset(p));
+    pWrap.appendChild(b);
+  });
+
+  // Rx editors
+  for (const k of ["R","L"]) {
+    const box = $("#rx-"+k);
+    box.innerHTML = `<h3>${k==="R"?"Høyre øye":"Venstre øye"}</h3>
+      <div class="row"><label for="sph-${k}">Sfære</label><input id="sph-${k}" type="range" min="-6" max="4" step="0.25"><output id="sphO-${k}"></output></div>
+      <div class="row"><label for="cyl-${k}">Sylinder</label><input id="cyl-${k}" type="range" min="-4" max="0" step="0.25"><output id="cylO-${k}"></output></div>
+      <div class="row"><label for="ax-${k}">Akse</label><input id="ax-${k}" type="range" min="0" max="180" step="5"><output id="axO-${k}"></output></div>`;
+    for (const f of ["sph","cyl","ax"]) {
+      $(`#${f}-${k}`).addEventListener("input", e => {
+        const v = parseFloat(e.target.value);
+        st.eye[k][f==="ax"?"axis":f] = v; st.preset = null; render();
+      });
+    }
+  }
+
+  const bindRange = (id, key) => $("#"+id).addEventListener("input", e => { st[key] = parseFloat(e.target.value); if(key==="amp") st.preset=null; render(); });
+  bindRange("amp","amp"); bindRange("pupil","pupil"); bindRange("dist","dist");
+  $("#dom").addEventListener("change", e => { st.dom = e.target.value; render(); });
+  $("#corr").addEventListener("change", e => { st.corrected = e.target.checked; render(); });
+  for (const [seg, key] of [["#segSight","sight"],["#segFocus","focus"]]) {
+    $(seg).addEventListener("click", e => {
+      const b = e.target.closest("button"); if (!b) return;
+      st[key] = b.dataset.v; render();
+    });
+  }
+
+  function syncControls(){
+    $("#amp").value = st.amp; $("#pupil").value = st.pupil; $("#dist").value = st.dist;
+    $("#dom").value = st.dom; $("#corr").checked = st.corrected;
+    for (const k of ["R","L"]) {
+      $(`#sph-${k}`).value = st.eye[k].sph; $(`#cyl-${k}`).value = st.eye[k].cyl; $(`#ax-${k}`).value = st.eye[k].axis;
+    }
+  }
+
+  // Optics
+  function meridians(k){
+    if (st.corrected) return [0,0];
+    const e = st.eye[k]; return [e.sph, e.sph + e.cyl];
+  }
+  function layers(){
+    const far = -1 / st.dist;
+    return st.sight === "irons"
+      ? [ {id:"target", name:"Blinken", V:far}, {id:"front", name:"Kornet", V:-1/D_FRONT}, {id:"rear", name:"Bakre sikte", V:-1/D_REAR} ]
+      : [ {id:"target", name:"Blinken", V:far}, {id:"dot", name:"Punktet", V:0}, {id:"frame", name:"Optikkvinduet", V:-1/D_FRAME} ];
+  }
+  function accommodation(){
+    const [m1, m2] = meridians(st.dom);
+    const se = (m1 + m2) / 2;
+    const Vf = st.focus === "near" ? (st.sight==="irons" ? -1/D_FRONT : -1/D_FRAME) : -1/st.dist;
+    const need = se - Vf;
+    return { A: Math.min(Math.max(need, 0), st.amp), need };
+  }
+  const sdFor = d => st.pupil * d * 1.02;  // px std-dev for defocus d (dioptres)
+  function quality(d){
+    if (d < 0.25) return ["skarp", 0];
+    if (d < 0.75) return ["litt uskarp", 1];
+    if (d < 1.5)  return ["uskarp", 2];
+    return ["svært uskarp", 3];
+  }
+
+  // Scene SVG
+  function targetShape(){
+    // Simplified IPSC target, 45 x 57 cm, aimed at the centre of the A-zone (17.5 cm from top)
+    const s = deg(1, st.dist) / 100;  // px per cm at target distance (small-angle)
+    const ox = CX - 22.5*s, oy = AIM_Y - 17.5*s;
+    const P = (x,y) => `${(ox+x*s).toFixed(1)},${(oy+y*s).toFixed(1)}`;
+    const outline = [P(11.25,0),P(33.75,0),P(45,11.25),P(45,45.75),P(33.75,57),P(11.25,57),P(0,45.75),P(0,11.25)].join(" ");
+    const az = [P(15,2.5),P(30,2.5),P(30,32.5),P(15,32.5)].join(" ");
+    const cz = [P(9,2.5),P(36,2.5),P(36,40),P(9,40)].join(" ");
+    const w = Math.max(0.6, s*0.25).toFixed(2);
+    return `<polygon points="${outline}" fill="var(--scene-card)"/>
+      <polygon points="${cz}" fill="none" stroke="var(--scene-ink)" stroke-width="${w}" stroke-dasharray="${(s*1.2).toFixed(1)} ${(s*0.8).toFixed(1)}" opacity=".7"/>
+      <polygon points="${az}" fill="none" stroke="var(--scene-ink)" stroke-width="${w}" stroke-dasharray="${(s*1.2).toFixed(1)} ${(s*0.8).toFixed(1)}" opacity=".85"/>`;
+  }
+  function frontSight(){
+    const w = deg(0.0033, D_FRONT), h = deg(0.009, D_FRONT);
+    const r = deg(0.0011, D_FRONT);
+    return `<rect x="${CX-w/2}" y="${AIM_Y}" width="${w}" height="${h}" fill="var(--scene-steel)"/>
+            <circle cx="${CX}" cy="${AIM_Y + r*1.6}" r="${r}" fill="var(--accent)"/>`;
+  }
+  function rearSight(){
+    const bw = deg(0.030, D_REAR), bh = deg(0.013, D_REAR);
+    const nw = deg(0.0040, D_REAR), nd = deg(0.0036, D_REAR);
+    const x0 = CX - bw/2, x1 = CX + bw/2, y0 = AIM_Y, y1 = AIM_Y + bh;
+    return `<path d="M${x0} ${y0} H${CX-nw/2} V${y0+nd} H${CX+nw/2} V${y0} H${x1} V${y1} H${x0} Z" fill="var(--scene-steel)"/>
+            <rect x="${x0-60}" y="${y1-2}" width="${bw+120}" height="300" fill="var(--scene-steel)"/>`;
+  }
+  function frame(){
+    const ww = deg(0.024, D_FRAME), wh = deg(0.017, D_FRAME), t = deg(0.004, D_FRAME);
+    const x = CX - ww/2, y = AIM_Y - wh/2 - 6;
+    return `<path fill-rule="evenodd" fill="var(--scene-steel)"
+             d="M${x-t} ${y-t*1.6} H${x+ww+t} V${y+wh+t*2.4} H${x-t} Z M${x} ${y} V${y+wh} H${x+ww} V${y} Z"/>
+            <rect x="${x}" y="${y}" width="${ww}" height="${wh}" fill="var(--scene-glass)"/>
+            <rect x="${x-t-80}" y="${y+wh+t*2.4-2}" width="${ww+2*t+160}" height="300" fill="var(--scene-steel)"/>`;
+  }
+  function dot(){
+    return `<circle cx="${CX}" cy="${AIM_Y}" r="1.7" fill="var(--scene-dot)"/>`;
+  }
+
+  function blurGroup(k, id, sdAlong, sdAcross, axis, content, boost){
+    const fid = `f-${k}-${id}`;
+    const a = sdAlong < 0.05 ? 0 : sdAlong, c = sdAcross < 0.05 ? 0 : sdAcross;
+    const gain = boost ? Math.min(1 + (a + c) * 1.6, 40) : 1;
+    const filt = `<filter id="${fid}" filterUnits="userSpaceOnUse" x="-1200" y="-1200" width="3040" height="2820" color-interpolation-filters="sRGB">
+        <feGaussianBlur stdDeviation="${a.toFixed(2)} ${c.toFixed(2)}" edgeMode="none"/>
+        ${boost ? `<feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 ${gain.toFixed(2)} 0"/>` : ""}
+      </filter>`;
+    return { def: filt,
+      body: `<g transform="rotate(${axis} ${CX} ${AIM_Y})"><g filter="url(#${fid})"><g transform="rotate(${-axis} ${CX} ${AIM_Y})">${content}</g></g></g>` };
+  }
+
+  function renderEye(k, acc){
+    const [m1, m2] = meridians(k);
+    const axis = st.corrected ? 0 : st.eye[k].axis;
+    const L = layers();
+    const content = { target: targetShape(), front: frontSight(), rear: rearSight(), frame: frame(), dot: dot() };
+    const defs = [], bodies = [], rows = [];
+    // draw order: far to near
+    const order = st.sight === "irons" ? ["target","front","rear"] : ["target","frame","dot"];
+    const byId = Object.fromEntries(L.map(l => [l.id, l]));
+    for (const id of order) {
+      const l = byId[id];
+      const d1 = Math.abs(l.V - (m1 - acc.A)), d2 = Math.abs(l.V - (m2 - acc.A));
+      const g = blurGroup(k, id, sdFor(d1), sdFor(d2), axis, content[id], id === "dot");
+      defs.push(g.def); bodies.push(g.body);
+    }
+    for (const l of L) {
+      const d1 = Math.abs(l.V - (m1 - acc.A)), d2 = Math.abs(l.V - (m2 - acc.A));
+      const d = Math.max(d1, d2), [q, s] = quality(d);
+      const dir = Math.abs(d1 - d2) >= 0.25 ? " · retning" : "";
+      rows.push(`<span class="k">${l.name}</span><span class="q s${s}">${q}${dir}</span><span class="v">${d.toFixed(2).replace(".",",")} D</span>`);
+    }
+    const isDom = st.dom === k;
+    const e = st.eye[k];
+    const rxText = st.corrected ? "korrigert" : `${fmtD(e.sph)} ${e.cyl ? fmtD(e.cyl)+" × "+e.axis+"°" : ""}`;
+    $("#eye-"+k).innerHTML = `
+      <div class="eye-head"><h2>${k==="R"?"Høyre øye":"Venstre øye"}</h2>
+        <span class="tag">${isDom ? "dominant · " : ""}${rxText}</span></div>
+      <div class="scene"><svg viewBox="0 0 640 420" role="img" aria-label="Siktebilde, ${k==="R"?"høyre":"venstre"} øye">
+        <defs>${defs.join("")}</defs>
+        <rect width="640" height="420" fill="var(--scene-sky)"/>
+        <rect y="300" width="640" height="120" fill="var(--scene-berm)" opacity=".55"/>
+        ${bodies.join("")}
+      </svg></div>
+      <div class="readout">${rows.join("")}</div>`;
+  }
+
+  function render(){
+    // controls state
+    $("#ampOut").textContent = st.amp.toFixed(2).replace(".",",") + " D";
+    const age = Math.round(Math.min(70, Math.max(10, (18.5 - st.amp) / 0.3)));
+    $("#ageHint").textContent = st.amp <= 0.5 ? "Omtrent som et øye på 60+ år." : `Omtrent som et snittøye på ${age} år.`;
+    $("#pupilOut").textContent = st.pupil.toFixed(1).replace(".",",") + " mm";
+    $("#distOut").textContent = st.dist + " m";
+    $("#focusNear").textContent = st.sight === "irons" ? "Kornet" : "Vinduet";
+    for (const [seg, key] of [["#segSight","sight"],["#segFocus","focus"]])
+      $(seg).querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === st[key])));
+    document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", String(c.dataset.id === st.preset)));
+    for (const k of ["R","L"]) {
+      const e = st.eye[k];
+      $(`#sphO-${k}`).textContent = fmtD(e.sph);
+      $(`#cylO-${k}`).textContent = fmtD(e.cyl);
+      $(`#axO-${k}`).textContent = e.axis + "°";
+      for (const f of ["sph","cyl","ax"]) $(`#${f}-${k}`).disabled = st.corrected;
+    }
+
+    const acc = accommodation();
+    renderEye("R", acc); renderEye("L", acc);
+
+    const target = st.focus === "near" ? (st.sight === "irons" ? "kornet" : "vinduet") : "blinken";
+    let msg = `Begge øyne fokuserer like mye. Det dominante øyet styrer: det bruker <b>${acc.A.toFixed(2).replace(".",",")} D</b> fokusevne for å se ${target}.`;
+    if (acc.need > st.amp + 0.01) msg += ` <b>Rekker ikke:</b> det mangler ${(acc.need - st.amp).toFixed(2).replace(".",",")} D, så ${target} blir uskarpt.`;
+    else if (acc.need < -0.01) msg += ` Øyet er nærsynt nok til at ${target} ligger innenfor uten å fokusere.`;
+    else if (acc.need > 0.75 * st.amp && acc.need > 0.5) msg += ` Det er nær grensen, så det blir slitsomt over tid.`;
+    $("#accNote").innerHTML = msg;
+  }
+
+  applyPreset(PRESETS[0]);
+})();
+</script>
